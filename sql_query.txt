@@ -1,0 +1,12 @@
+SELECT public."toolLocation"."toolId", x, y FROM public."toolLocation"
+JOIN (
+	SELECT "toolId", MAX("ts") AS latest_timestamp
+	FROM public."toolLocation"
+	GROUP BY "toolId"
+) subquery ON public."toolLocation"."toolId" = subquery."toolId" AND public."toolLocation"."ts" = subquery.latest_timestamp
+ORDER BY public."toolLocation"."toolId" ASC
+
+
+____________________________
+
+Above is to get latest x,y coordinate table for each of the toolIds
