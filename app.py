@@ -29,7 +29,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
         id='interval-component',
-        interval=60*1000, #update scatterplot on a 60,000ms interval  
+        interval=5*1000, #update scatterplot on a 60,000ms interval  
         n_intervals=0 #n_intervals is defined as the number of times the interval has passed, its default value is 0
     )
 ])
@@ -69,13 +69,24 @@ def create_scatterplot(data): #use plotly express to make a scatterplot with col
                #has passed. Output and Input take a component_id and a component_property. The ID of our dcc.Interval is 'interval-component' and 
                #the property we're looking for changes in is the 'n_interval' component.
     Output('scatter-plot', 'figure'),
-    [Input('interval-component', 'n_intervals')]
+    [Input('interval-component', 'n_intervals'), Input('scatter-plot', 'figure')]
 )
-def update_scatter_plot(n): #this callback will use this function whenever the input values change, and pass the return into the output
+def update_scatter_plot(n, existing_fig): #this callback will use this function whenever the input values change, and pass the return into the output
     # print("update 1")
     latest_data = update_DF()
     fig = create_scatterplot(latest_data)
-    return fig
+    if n == 0:
+        return fig
+    else:
+        print(latest_data['x'][0])
+        for i in range(4):
+          existing_fig['data'][i]['x'][0] = latest_data['x'][i]
+          existing_fig['data'][i]['y'][0] = latest_data['y'][i] 
+        # existing_fig['data'][0]['x'][0] = existing_fig['data'][0]['x'][0] + 10.0
+        # existing_fig['data'][0]['y'][0] = existing_fig['data'][0]['y'][0] + 10.0
+        # existing_fig.add_trace(fig)
+        return existing_fig
+        # existing_fig.add_trace(latest_data)
 
 if __name__ == '__main__': #run the app
     app.run_server(debug=True,host = '127.0.0.1')
